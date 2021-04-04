@@ -1,0 +1,46 @@
+#!/usr/bin/expect
+
+log_user 0
+set chan A
+
+set push [open /dev/mgt400.$chan.push_status r]
+spawn -open $push
+set push_id $spawn_id
+
+
+set pull [open /dev/mgt400.$chan.pull_status r]
+spawn -open $pull
+set pull_id $spawn_id
+
+proc on_push_up {} {
+	puts "push up"
+	exec set.site 0 CONTINUOUS 1
+}
+
+proc on_push_down {} {
+	puts "push down"
+	exec set.site 0 CONTINUOUS 0
+}
+
+proc on_pull_up {} {
+	puts "pull up"
+}
+
+proc on_pull_down {} {
+	puts "pull down"
+	exec awg_abort 1
+}
+
+
+
+while { 1 } {
+	expect {
+		-i $push_id "1\n" on_push_up
+                -i $push_id "0\n" on_push_down
+                -i $pull_id "1\n" on_pull_up
+                -i $pull_id "0\n" on_pull_down
+	}
+}
+
+
+

@@ -1,0 +1,51 @@
+README for package: custom_gpsntp
+
+Configures ACQ400 as an NTP server conditioned by GPS
+
+#1 GPS NMEA feed on ttyPS2
+
+#2 PPS input
+
+Must be in the device tree at boot, eg
+dtb.d/acq1002r.dtb
+	pps1 {
+		/* TRG.d6 on ptype ... we're not sure which one it will be */
+		gpios = <&gpio0 60 0>;
+	
+		compatible = "pps-gpio";
+		status = "disabled";	
+	};
+
+
+dtb.d/acq1002.dtb
+Prototype system ..
+
+	pps {
+		/* TRG.d3 on ptype */
+		gpios = <&gpio0 57 0>;
+		
+		compatible = "pps-gpio";
+		status = "okay";	
+	};
+
+
+#3 Provides own ntp.conf
+/usr/local/CARE/GPSNTP/ntp.conf
+
+unless overridden by /mnt/local/ntp.conf
+
+The correct executable is /usr/sbin/ntpd.orig
+
+NB: do NOT use /usr/sbin/ntpd
+
+The init file gives you the opportunity to override the default command using a stored script
+
+#4 For UBX GPS units, set 
+GPS_UBX=1    in /mnt/local/sysconfig/acq400.sh
+
+ #1 TP2 set to 100Hz
+# add to /mnt/local/rc.user
+gps_reset
+sleep 10
+/usr/local/bin/ubx_set_tp2
+

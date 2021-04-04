@@ -1,0 +1,26 @@
+#!/bin/sh
+
+stop() {
+	if [ -e /var/run/llc_callbacks.pid ]; then
+		kill -9 $(cat /var/run/llc_callbacks.pid)
+		rm /var/run/llc_callbacks.pid
+	fi
+}
+start() {
+	stop
+	if [ -e /mnt/local/llc_callbacks ]; then
+		cmd=/mnt/local/llc_callbacks
+	else
+		cmd=/usr/local/CARE/llc_callbacks
+	fi
+	($cmd 2>&1 | logger -t llc_callbacks) & echo $! >/var/run/llc_callbacks.pid
+}
+
+
+if [ "x$1" = "xstop" ]; then
+	stop
+else
+	start
+fi
+
+
