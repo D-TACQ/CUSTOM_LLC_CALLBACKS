@@ -1,7 +1,11 @@
 #!/usr/bin/expect
 
 log_user 0
+
 set chan A
+if { $::argc > 0 } {
+	set chan [lindex $::argv 0]
+}
 
 set push [open /dev/mgt400.$chan.push_status r]
 spawn -open $push
